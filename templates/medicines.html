@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Search Bar and Categories -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form class="d-flex" method="GET">
+                <input type="text" name="search" class="form-control me-2" placeholder="Search medicines..." value="{{ request.args.get('search', '') }}">
+                <button type="submit" class="btn btn-warning px-4">Search</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" name="category" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                <option value="Pain Relief">Pain Relief</option>
+                <option value="Antibiotics">Antibiotics</option>
+                <option value="Digestive Health">Digestive Health</option>
+                <option value="Cardiac Care">Cardiac Care</option>
+                <option value="Diabetes Care">Diabetes Care</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Medicines Grid -->
+    <div class="row g-4">
+        {% for medicine in medicines %}
+        <div class="col-md-3">
+            <div class="card border-0 h-100">
+                <img src="{{ medicine.image_url }}" class="card-img-top p-3" alt="{{ medicine.name }}" style="height: 200px; object-fit: contain;">
+                <div class="card-body p-3">
+                    <h5 class="card-title mb-1">{{ medicine.name }}</h5>
+                    <p class="text-muted small mb-2">{{ medicine.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="text-warning mb-0">₹{{ "%.2f"|format(medicine.price) }}</h5>
+                            <small class="text-muted">Stock: {{ medicine.stock }}</small>
+                        </div>
+                        {% if current_user.is_authenticated %}
+                        <form method="POST" action="{{ url_for('add_to_cart', medicine_id=medicine.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-secondary btn-sm">Add to Cart</button>
+                        </form>
+                        {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-secondary btn-sm">Login to Order</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- No Results Message -->
+    {% if medicines|length == 0 %}
+    <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h3>No medicines found</h3>
+        <p class="text-muted">Try searching with different keywords or browse all categories</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.card {
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.form-control, .form-select {
+    padding: 0.75rem 1rem;
+    border-color: #e4e4e4;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #ff9f00;
+    box-shadow: 0 0 0 0.2rem rgba(255, 159, 0, 0.25);
+}
+
+.btn-warning {
+    background-color: #ff9f00;
+    border-color: #ff9f00;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #f59400;
+    border-color: #f59400;
+    color: white;
+}
+
+.text-warning {
+    color: #ff9f00 !important;
+}
+</style>
+{% endblock %}

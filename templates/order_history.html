@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Order History</h2>
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Order Date</th>
+                    <th>Medicine</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Delivery Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.order_date }}</td>
+                    <td>{{ order.medicine_name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>₹{{ "%.2f"|format(order.unit_price) }}</td>
+                    <td>₹{{ "%.2f"|format(order.total_price) }}</td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if order.status == 'completed' else 'warning' }}">
+                            {{ order.status|title }}
+                        </span>
+                    </td>
+                    <td>{{ order.delivery_address }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center my-5">
+        <img src="https://i.ibb.co/K7JfsDj/empty-cart.png" alt="No orders" style="width: 100px;">
+        <h3 class="mt-3">No orders yet</h3>
+        <p>Start shopping to see your order history</p>
+        <a href="{{ url_for('medicines') }}" class="btn btn-primary">Browse Medicines</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

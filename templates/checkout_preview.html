@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Order Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Medicine</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td>{{ item.medicine.name }}</td>
+                                    <td>₹{{ "%.2f"|format(item.medicine.price) }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₹{{ "%.2f"|format(item.subtotal) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3">Total Amount:</th>
+                                    <th>₹{{ "%.2f"|format(total) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Delivery Address</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>{{ address.full_name }}</strong></p>
+                    <p>{{ address.address_line1 }}</p>
+                    {% if address.address_line2 %}
+                    <p>{{ address.address_line2 }}</p>
+                    {% endif %}
+                    <p>{{ address.city }}, {{ address.state }} - {{ address.pincode }}</p>
+                    <p>Phone: {{ address.phone }}</p>
+                    <a href="{{ url_for('checkout_address') }}" class="btn btn-outline-secondary">Edit Address</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Payment Method</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('checkout_payment') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="payment_method" id="upi" value="upi">
+                            <label class="form-check-label" for="upi">
+                                UPI Payment
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="payment_method" id="card" value="card">
+                            <label class="form-check-label" for="card">
+                                Credit/Debit Card
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="payment_method" id="cod" value="cod" checked>
+                            <label class="form-check-label" for="cod">
+                                Cash on Delivery
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Proceed to Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% endblock %}

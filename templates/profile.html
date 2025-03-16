@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Profile Information</h3>
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ current_user.full_name }}</p>
+                    <p><strong>Email:</strong> {{ current_user.email }}</p>
+                    <p><strong>Phone:</strong> {{ current_user.phone or 'Not provided' }}</p>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Delivery Address</h5>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editAddressModal">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                    {% if current_user.address_line1 %}
+                        <p>{{ current_user.address_line1 }}</p>
+                        {% if current_user.address_line2 %}
+                            <p>{{ current_user.address_line2 }}</p>
+                        {% endif %}
+                        <p>{{ current_user.city }}, {{ current_user.state }} - {{ current_user.pincode }}</p>
+                    {% else %}
+                        <p class="text-muted">No address provided</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Order History</h3>
+                </div>
+                <div class="card-body">
+                    {% if orders %}
+                    <div class="accordion" id="orderAccordion">
+                        {% for order in orders %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#order{{ order.id }}">
+                                    <div class="d-flex justify-content-between w-100 me-3">
+                                        <span>Order #{{ order.id }} - {{ order.order_date }}</span>
+                                        <span class="badge bg-{{ 'success' if order.status == 'completed' else 'warning' }}">
+                                            {{ order.status|title }}
+                                        </span>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="order{{ order.id }}" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                    <!-- Bill Details -->
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="text-center mb-4">
+                                                <h4>MediCare</h4>
+                                                <p class="text-muted">Order Invoice</p>
+                                            </div>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-sm-6">
+                                                    <h6 class="mb-3">Delivery Address:</h6>
+                                                    <div>{{ order.delivery_address }}</div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <h6 class="mb-3">Order Details:</h6>
+                                                    <div>Order ID: #{{ order.id }}</div>
+                                                    <div>Date: {{ order.order_date }}</div>
+                                                    <div>Payment Method: {{ order.payment_method|upper }}</div>
+                                                    <div>Payment Status: {{ order.payment_status|title }}</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Medicine</th>
+                                                            <th>Quantity</th>
+                                                            <th>Unit Price</th>
+                                                            <th>Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for item in order['order_items'] %}
+                                                        <tr>
+                                                            <td>
+                                                                {{ item['medicine_name'] }}
+                                                                <br>
+                                                                <small class="text-muted">{{ item['description'] }}</small>
+                                                            </td>
+                                                            <td>{{ item['quantity'] }}</td>
+                                                            <td>₹{{ "%.2f"|format(item['unit_price']) }}</td>
+                                                            <td>₹{{ "%.2f"|format(item['total_price']) }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td colspan="3" class="text-end">
+                                                                <strong>Total Amount:</strong>
+                                                            </td>
+                                                            <td>
+                                                                <strong>₹{{ "%.2f"|format(order.total_amount) }}</strong>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+
+                                            <div class="text-end mt-3">
+                                                <button class="btn btn-primary btn-sm" onclick="window.print()">
+                                                    <i class="fas fa-print me-1"></i> Print Bill
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center my-5">
+                        <img src="{{ url_for('static', filename='images/ui/empty-orders.png') }}" alt="No orders" style="width: 150px;">
+                        <h3 class="mt-4">No orders yet</h3>
+                        <p class="text-muted mb-4">Start shopping to see your order history</p>
+                        <a href="{{ url_for('medicines') }}" class="btn btn-primary">Browse Medicines</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('update_profile') }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="full_name" value="{{ current_user.full_name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" value="{{ current_user.email }}" readonly>
+                        <small class="text-muted">Email cannot be changed</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" value="{{ current_user.phone }}" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Address Modal -->
+<div class="modal fade" id="editAddressModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('update_address') }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">Address Line 1</label>
+                        <input type="text" class="form-control" name="address_line1" value="{{ current_user.address_line1 }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address Line 2</label>
+                        <input type="text" class="form-control" name="address_line2" value="{{ current_user.address_line2 }}">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" name="city" value="{{ current_user.city }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">State</label>
+                            <select class="form-select" name="state" required>
+                                <option value="">Select State</option>
+                                {% for state in ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'] %}
+                                <option value="{{ state }}" {% if current_user.state == state %}selected{% endif %}>{{ state }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">PIN Code</label>
+                        <input type="text" class="form-control" name="pincode" value="{{ current_user.pincode }}" pattern="[0-9]{6}" title="Please enter a valid 6-digit PIN code" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.accordion-button:not(.collapsed) {
+    background-color: #f8f9fa;
+    color: #000;
+}
+.badge {
+    font-size: 0.9em;
+}
+.btn-outline-primary {
+    border-color: #02475b;
+    color: #02475b;
+}
+.btn-outline-primary:hover {
+    background-color: #02475b;
+    border-color: #02475b;
+    color: white;
+}
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+.form-label {
+    font-weight: 500;
+    color: #444;
+}
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .accordion-body * {
+        visibility: visible;
+    }
+    .accordion-body {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    .btn-print {
+        display: none;
+    }
+}
+</style>
+{% endblock %}

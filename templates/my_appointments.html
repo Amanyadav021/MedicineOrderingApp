@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appointments{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4">My Appointments</h2>
+    
+    <div class="row">
+        <div class="col-md-12">
+            {% if appointments %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Doctor</th>
+                                    <th>Specialty</th>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Payment</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">{{ appointment.doctor_name }}</h6>
+                                                <small class="text-muted">{{ appointment.qualification }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ appointment.specialty_name }}</td>
+                                    <td>
+                                        <div>{{ appointment.appointment_date }}</div>
+                                        <small class="text-muted">{{ appointment.appointment_time }}</small>
+                                    </td>
+                                    <td>
+                                        {% if appointment.consultation_type == 'online' %}
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-video me-1"></i> Online
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-hospital me-1"></i> In-Person
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if appointment.status == 'confirmed' %}
+                                        <span class="badge bg-success">Confirmed</span>
+                                        {% elif appointment.status == 'completed' %}
+                                        <span class="badge bg-primary">Completed</span>
+                                        {% elif appointment.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if appointment.payment_status == 'completed' %}
+                                        <span class="badge bg-success">Paid</span>
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>₹{{ appointment.amount }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                    <h4>No Appointments Found</h4>
+                    <p class="text-muted">You haven't booked any appointments yet.</p>
+                    <a href="{{ url_for('doctors') }}" class="btn btn-primary">
+                        Find & Book Doctors
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

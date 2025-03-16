@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Payment for Lab Test</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="payment-form">
+                        <div class="mb-4">
+                            <h5>Select Payment Method</h5>
+                            
+                            <!-- UPI Payment -->
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" 
+                                       value="upi" id="upiPayment" checked>
+                                <label class="form-check-label" for="upiPayment">
+                                    UPI Payment
+                                </label>
+                                <div class="upi-section mt-2" id="upiSection">
+                                    <input type="text" class="form-control" name="upi_id" 
+                                           placeholder="Enter UPI ID (e.g., name@upi)">
+                                </div>
+                            </div>
+                            
+                            <!-- Card Payment -->
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" 
+                                       value="card" id="cardPayment">
+                                <label class="form-check-label" for="cardPayment">
+                                    Credit/Debit Card
+                                </label>
+                                <div class="card-section mt-2" id="cardSection" style="display: none;">
+                                    <input type="text" class="form-control mb-2" name="card_number" 
+                                           placeholder="Card Number">
+                                    <div class="row">
+                                        <div class="col">
+                                            <input type="text" class="form-control" name="expiry" 
+                                                   placeholder="MM/YY">
+                                        </div>
+                                        <div class="col">
+                                            <input type="text" class="form-control" name="cvv" 
+                                                   placeholder="CVV">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Cash Payment -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" 
+                                       value="cash" id="cashPayment">
+                                <label class="form-check-label" for="cashPayment">
+                                    Cash on Collection
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="payment-notice alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            For cash payment, please keep exact change ready during sample collection.
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Complete Payment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const upiPayment = document.getElementById('upiPayment');
+    const cardPayment = document.getElementById('cardPayment');
+    const cashPayment = document.getElementById('cashPayment');
+    const upiSection = document.getElementById('upiSection');
+    const cardSection = document.getElementById('cardSection');
+    
+    function togglePaymentSections() {
+        upiSection.style.display = upiPayment.checked ? 'block' : 'none';
+        cardSection.style.display = cardPayment.checked ? 'block' : 'none';
+    }
+    
+    upiPayment.addEventListener('change', togglePaymentSections);
+    cardPayment.addEventListener('change', togglePaymentSections);
+    cashPayment.addEventListener('change', togglePaymentSections);
+    
+    // Initial state
+    togglePaymentSections();
+});
+</script>
+{% endblock %} 

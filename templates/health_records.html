@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Left Column: Upload Form -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Upload Health Record</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('upload_health_record') }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Record Type</label>
+                            <select name="record_type" class="form-select" required>
+                                <option value="prescription">Prescription</option>
+                                <option value="lab_report">Lab Report</option>
+                                <option value="vaccination">Vaccination Record</option>
+                                <option value="surgery">Surgery Record</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="record_date" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="3" 
+                                    placeholder="Brief description of the record"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Upload File</label>
+                            <input type="file" name="file" class="form-control" required 
+                                   accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="form-text">
+                                Supported formats: PDF, JPG, PNG
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Upload Record</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Records Display -->
+        <div class="col-md-8">
+            <!-- Lab Reports Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Lab Test Reports</h4>
+                </div>
+                <div class="card-body">
+                    {% if lab_reports %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Test Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in lab_reports %}
+                                <tr>
+                                    <td>{{ report.booking_date }}</td>
+                                    <td>{{ report.test_name }}</td>
+                                    <td>
+                                        <a href="{{ report.report_url }}" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="fas fa-file-pdf me-1"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No lab test reports available</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Prescriptions Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Prescriptions</h4>
+                </div>
+                <div class="card-body">
+                    {% if prescriptions %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prescription in prescriptions %}
+                                <tr>
+                                    <td>{{ prescription.prescription_date }}</td>
+                                    <td>{{ prescription.description or 'No description' }}</td>
+                                    <td>
+                                        <a href="{{ prescription.file_url }}" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="fas fa-file-pdf me-1"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No prescriptions available</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Medical History Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h4>Medical History</h4>
+                </div>
+                <div class="card-body">
+                    {% if medical_history %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in medical_history %}
+                                <tr>
+                                    <td>{{ record.record_date }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ record.record_type|title }}</span>
+                                    </td>
+                                    <td>{{ record.description or 'No description' }}</td>
+                                    <td>
+                                        <a href="{{ record.file_url }}" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="fas fa-file-pdf me-1"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No medical history records available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.progress {
+    height: 10px;
+    border-radius: 5px;
+}
+
+.progress-bar {
+    background-color: #004d7a;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+</style>
+{% endblock %}

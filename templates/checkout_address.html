@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Delivery Address</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" 
+                                   value="{{ address.full_name or '' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   value="{{ address.phone or '' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="address_line1" class="form-label">Address Line 1</label>
+                            <input type="text" class="form-control" id="address_line1" name="address_line1" 
+                                   value="{{ address.address_line1 or '' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="address_line2" class="form-label">Address Line 2 (Optional)</label>
+                            <input type="text" class="form-control" id="address_line2" name="address_line2" 
+                                   value="{{ address.address_line2 or '' }}">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" name="city" 
+                                       value="{{ address.city or '' }}" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="state" class="form-label">State</label>
+                                <input type="text" class="form-control" id="state" name="state" 
+                                       value="{{ address.state or '' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="pincode" class="form-label">PIN Code</label>
+                            <input type="text" class="form-control" id="pincode" name="pincode" 
+                                   value="{{ address.pincode or '' }}" required>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('cart') }}" class="btn btn-secondary">Back to Cart</a>
+                            <button type="submit" class="btn btn-primary">Continue to Preview</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

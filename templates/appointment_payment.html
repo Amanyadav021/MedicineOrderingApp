@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment for Appointment{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Payment</h3>
+                    
+                    <form method="POST" class="needs-validation" novalidate>
+                        <!-- Payment Methods -->
+                        <div class="mb-4">
+                            <label class="form-label">Select Payment Method</label>
+                            
+                            <!-- UPI -->
+                            <div class="form-check card mb-3">
+                                <div class="card-body">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="upi" value="upi" required>
+                                    <label class="form-check-label w-100" for="upi">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-mobile-alt fa-2x text-primary me-3"></i>
+                                            <div>
+                                                <h6 class="mb-1">UPI Payment</h6>
+                                                <p class="small text-muted mb-0">Pay using UPI ID or QR code</p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Card -->
+                            <div class="form-check card mb-3">
+                                <div class="card-body">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="card" value="card" required>
+                                    <label class="form-check-label w-100" for="card">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-credit-card fa-2x text-primary me-3"></i>
+                                            <div>
+                                                <h6 class="mb-1">Credit/Debit Card</h6>
+                                                <p class="small text-muted mb-0">Pay using your card</p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Net Banking -->
+                            <div class="form-check card">
+                                <div class="card-body">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="netbanking" value="netbanking" required>
+                                    <label class="form-check-label w-100" for="netbanking">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-university fa-2x text-primary me-3"></i>
+                                            <div>
+                                                <h6 class="mb-1">Net Banking</h6>
+                                                <p class="small text-muted mb-0">Pay using your bank account</p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="invalid-feedback">
+                                Please select a payment method.
+                            </div>
+                        </div>
+
+                        <!-- Payment Button -->
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            Pay Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Validation Script -->
+<script>
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %} 

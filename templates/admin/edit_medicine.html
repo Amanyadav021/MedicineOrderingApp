@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Edit Medicine</h2>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Medicine Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ medicine.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" required>{{ medicine.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ medicine.price }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="stock" class="form-label">Stock</label>
+            <input type="number" class="form-control" id="stock" name="stock" value="{{ medicine.stock }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <select class="form-control" id="category" name="category" required>
+                <option value="Pain Relief" {% if medicine.category == 'Pain Relief' %}selected{% endif %}>Pain Relief</option>
+                <option value="Antibiotics" {% if medicine.category == 'Antibiotics' %}selected{% endif %}>Antibiotics</option>
+                <option value="Digestive Health" {% if medicine.category == 'Digestive Health' %}selected{% endif %}>Digestive Health</option>
+                <option value="Heart Health" {% if medicine.category == 'Heart Health' %}selected{% endif %}>Heart Health</option>
+                <option value="Diabetes Care" {% if medicine.category == 'Diabetes Care' %}selected{% endif %}>Diabetes Care</option>
+                <option value="Vitamins & Supplements" {% if medicine.category == 'Vitamins & Supplements' %}selected{% endif %}>Vitamins & Supplements</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="image_url" class="form-label">Image URL</label>
+            <input type="url" class="form-control" id="image_url" name="image_url" value="{{ medicine.image_url }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Medicine</button>
+        <a href="{{ url_for('admin_medicines') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

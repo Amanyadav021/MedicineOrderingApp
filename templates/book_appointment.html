@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment with {{ doctor.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Book Appointment</h3>
+                    
+                    <!-- Doctor Info -->
+                    <div class="d-flex align-items-center mb-4">
+                        {% if doctor.image_url %}
+                        <img src="{{ doctor.image_url }}" class="rounded-circle me-3" alt="{{ doctor.name }}" style="width: 60px; height: 60px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-user-md fa-2x text-muted"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-1">{{ doctor.name }}</h5>
+                            <p class="text-muted mb-0">{{ doctor.specialty_name }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <form method="POST" class="needs-validation" novalidate>
+                        <!-- Date Selection -->
+                        <div class="mb-3">
+                            <label for="appointment_date" class="form-label">Select Date</label>
+                            <select class="form-select" id="appointment_date" name="appointment_date" required>
+                                <option value="">Choose date</option>
+                                {% for date in available_dates %}
+                                <option value="{{ date }}">{{ date }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select an appointment date.
+                            </div>
+                        </div>
+
+                        <!-- Time Selection -->
+                        <div class="mb-3">
+                            <label for="appointment_time" class="form-label">Select Time</label>
+                            <select class="form-select" id="appointment_time" name="appointment_time" required>
+                                <option value="">Choose time</option>
+                                {% for slot in timeslots %}
+                                <option value="{{ slot.start_time }}">{{ slot.start_time }} - {{ slot.end_time }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select an appointment time.
+                            </div>
+                        </div>
+
+                        <!-- Consultation Type -->
+                        <div class="mb-3">
+                            <label class="form-label">Consultation Type</label>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="form-check card">
+                                        <div class="card-body">
+                                            <input class="form-check-input" type="radio" name="consultation_type" id="online" value="online" required>
+                                            <label class="form-check-label w-100" for="online">
+                                                <i class="fas fa-video text-primary mb-2"></i>
+                                                <h6 class="mb-1">Online Consultation</h6>
+                                                <p class="small text-muted mb-0">Video call with doctor</p>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check card">
+                                        <div class="card-body">
+                                            <input class="form-check-input" type="radio" name="consultation_type" id="in-person" value="in-person" required>
+                                            <label class="form-check-label w-100" for="in-person">
+                                                <i class="fas fa-hospital text-primary mb-2"></i>
+                                                <h6 class="mb-1">In-Person Visit</h6>
+                                                <p class="small text-muted mb-0">Visit clinic</p>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please select a consultation type.
+                            </div>
+                        </div>
+
+                        <!-- Symptoms -->
+                        <div class="mb-4">
+                            <label for="symptoms" class="form-label">Describe Your Symptoms</label>
+                            <textarea class="form-control" id="symptoms" name="symptoms" rows="3" required></textarea>
+                            <div class="invalid-feedback">
+                                Please describe your symptoms.
+                            </div>
+                        </div>
+
+                        <!-- Fee Summary -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Consultation Fee</h6>
+                                        <p class="small text-muted mb-0">Including all taxes</p>
+                                    </div>
+                                    <h5 class="mb-0">₹{{ doctor.consultation_fee }}</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            Proceed to Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Validation Script -->
+<script>
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %} 

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Find Doctors{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4">Find Doctors</h2>
+    
+    <!-- Search and Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('doctors') }}" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="search" placeholder="Search by doctor name, specialty or condition" value="{{ search or '' }}">
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" name="specialty">
+                        <option value="">All Specialties</option>
+                        {% for specialty in specialties %}
+                        <option value="{{ specialty.id }}" {% if selected_specialty == specialty.id %}selected{% endif %}>
+                            {{ specialty.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Doctors List -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for doctor in doctors %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="doctor-image-container">
+                    {% if doctor.image_url %}
+                    <img src="{{ doctor.image_url }}" class="card-img-top doctor-image" alt="{{ doctor.name }}">
+                    {% else %}
+                    <div class="doctor-image-placeholder d-flex align-items-center justify-content-center">
+                        <i class="fas fa-user-md fa-4x text-muted"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ doctor.name }}</h5>
+                    <p class="card-text text-muted mb-1">{{ doctor.specialty_name }}</p>
+                    <p class="card-text small mb-2">{{ doctor.qualification }}</p>
+                    <p class="card-text">
+                        <i class="fas fa-star text-warning"></i> {{ doctor.experience }} Years Experience
+                    </p>
+                    <p class="card-text">
+                        <i class="fas fa-language"></i> 
+                        {% for lang in doctor.languages|fromjson %}
+                        <span class="badge bg-light text-dark">{{ lang }}</span>
+                        {% endfor %}
+                    </p>
+                    <p class="card-text">
+                        <strong>₹{{ doctor.consultation_fee }}</strong> per consultation
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a href="{{ url_for('doctor_profile', doctor_id=doctor.id) }}" class="btn btn-outline-primary w-100">
+                        View Profile & Book
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No doctors found matching your criteria. Please try different search terms or filters.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.doctor-image-container {
+    height: 250px;
+    overflow: hidden;
+    position: relative;
+    background-color: #f8f9fa;
+}
+
+.doctor-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+}
+
+.doctor-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}

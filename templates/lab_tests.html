@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Lab Tests & Health Packages</h1>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <input type="text" class="form-control" id="searchTests" placeholder="Search for tests...">
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" id="categoryFilter">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category.category }}">{{ category.category }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Popular Health Packages -->
+    {% for category, tests in tests_by_category.items() %}
+    <h2 class="mb-4">{{ category }}</h2>
+    <div class="row mb-5">
+        {% for test in tests %}
+        <div class="col-md-4 mb-4 test-card" data-category="{{ test.category }}">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ test.name }}</h5>
+                    <p class="card-text text-muted">{{ test.description }}</p>
+                    
+                    {% if test.included_tests %}
+                    <div class="included-tests mb-3">
+                        <h6 class="mb-2">Included Tests:</h6>
+                        <ul class="list-unstyled">
+                            {% for included in test.included_tests|fromjson %}
+                            <li><i class="fas fa-check text-success me-2"></i>{{ included }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    {% if test.features %}
+                    <div class="features mb-3">
+                        <ul class="list-unstyled">
+                            {% for feature in test.features|fromjson %}
+                            <li><i class="fas fa-check text-success me-2"></i>{{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    {% if test.preparation %}
+                    <div class="preparation mb-3">
+                        <h6 class="mb-2">Preparation:</h6>
+                        <p class="small text-muted">{{ test.preparation }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <p class="card-text">
+                            <span class="h4 text-primary">₹{{ "%.2f"|format(test.price) }}</span>
+                        </p>
+                        <a href="{{ url_for('book_lab_test', test_id=test.id) }}" class="btn btn-primary w-100">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <!-- Why Choose Us -->
+    <div class="mt-5 bg-light p-4 rounded">
+        <h2 class="mb-4">Why Choose Our Lab Services?</h2>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-home fa-3x text-primary mb-3"></i>
+                    <h4>Home Collection</h4>
+                    <p>Free sample collection at your doorstep</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-flask fa-3x text-primary mb-3"></i>
+                    <h4>NABL Accredited</h4>
+                    <p>High quality, accurate results</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-file-medical-alt fa-3x text-primary mb-3"></i>
+                    <h4>Digital Reports</h4>
+                    <p>Get reports online within 24 hours</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+                    <h4>Expert Consultation</h4>
+                    <p>Free consultation with health experts</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchTests');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const testCards = document.querySelectorAll('.test-card');
+    
+    function filterTests() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCategory = categoryFilter.value.toLowerCase();
+        
+        testCards.forEach(card => {
+            const title = card.querySelector('.card-title').textContent.toLowerCase();
+            const description = card.querySelector('.card-text').textContent.toLowerCase();
+            const category = card.dataset.category.toLowerCase();
+            
+            const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+            const matchesCategory = !selectedCategory || category === selectedCategory;
+            
+            card.style.display = matchesSearch && matchesCategory ? 'block' : 'none';
+        });
+    }
+    
+    searchInput.addEventListener('input', filterTests);
+    categoryFilter.addEventListener('change', filterTests);
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card">
+        <div class="card-header">
+            <h3>Order Bill</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5>Delivery Address:</h5>
+                    <p>{{ order.delivery_address }}</p>
+                    <h5>Order Date:</h5>
+                    <p>{{ order.order_date }}</p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>₹{{ "%.2f"|format(item.price) }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>₹{{ "%.2f"|format(item.total_price) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3">Total Amount:</th>
+                            <th>₹{{ "%.2f"|format(order.total_price) }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                <form action="" method="post">
+                    {{ form.hidden_tag() }}
+                    <a href="{{ url_for('profile') }}" class="btn btn-primary">Back to Profile</a>
+                    <button onclick="window.print()" class="btn btn-secondary">Print Bill</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

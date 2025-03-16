@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Book Lab Test</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Test Details -->
+                    <div class="test-details mb-4">
+                        <h4>{{ test.name }}</h4>
+                        <p class="text-muted">{{ test.description }}</p>
+                        
+                        {% if test.included_tests %}
+                        <div class="included-tests mb-3">
+                            <h5 class="h6">Included Tests:</h5>
+                            <ul class="list-unstyled">
+                                {% for included in test.included_tests|fromjson %}
+                                <li><i class="fas fa-check text-success me-2"></i>{{ included }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        {% if test.preparation %}
+                        <div class="preparation mb-3">
+                            <h5 class="h6">Test Preparation:</h5>
+                            <p class="small text-muted">{{ test.preparation }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <p class="h5 text-primary mb-4">Price: ₹{{ "%.2f"|format(test.price) }}</p>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <form method="POST" class="booking-form">
+                        <div class="mb-3">
+                            <label class="form-label">Select Date</label>
+                            <select name="booking_date" class="form-select" required>
+                                {% for date in available_dates %}
+                                <option value="{{ date }}">{{ date }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Time Slot</label>
+                            <select name="booking_time" class="form-select" required>
+                                {% for time in time_slots %}
+                                <option value="{{ time }}">{{ time }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Collection Type</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="collection_type" 
+                                       value="home" id="homeCollection" checked>
+                                <label class="form-check-label" for="homeCollection">
+                                    Home Collection
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="collection_type" 
+                                       value="lab" id="labVisit">
+                                <label class="form-check-label" for="labVisit">
+                                    Visit Lab
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="addressSection" class="mb-3">
+                            <label class="form-label">Collection Address</label>
+                            <textarea name="address" class="form-control" rows="3" 
+                                    placeholder="Enter your complete address">{{ current_user.address_line1 }}
+{% if current_user.address_line2 %}{{ current_user.address_line2 }}{% endif %}
+{{ current_user.city }}, {{ current_user.state }} - {{ current_user.pincode }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Proceed to Payment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const homeCollection = document.getElementById('homeCollection');
+    const labVisit = document.getElementById('labVisit');
+    const addressSection = document.getElementById('addressSection');
+    
+    function toggleAddressSection() {
+        addressSection.style.display = homeCollection.checked ? 'block' : 'none';
+    }
+    
+    homeCollection.addEventListener('change', toggleAddressSection);
+    labVisit.addEventListener('change', toggleAddressSection);
+    
+    // Initial state
+    toggleAddressSection();
+});
+</script>
+{% endblock %} 

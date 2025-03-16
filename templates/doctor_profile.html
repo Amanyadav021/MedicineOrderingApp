@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ doctor.name }} - Doctor Profile{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <!-- Doctor Profile -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="doctor-profile-image-container mb-3">
+                                {% if doctor.image_url %}
+                                <img src="{{ doctor.image_url }}" class="doctor-profile-image" alt="{{ doctor.name }}">
+                                {% else %}
+                                <div class="doctor-profile-placeholder d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-user-md fa-5x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h2 class="mb-2">{{ doctor.name }}</h2>
+                            <p class="text-muted mb-2">{{ doctor.specialty_name }}</p>
+                            <p class="mb-2">{{ doctor.qualification }}</p>
+                            <p class="mb-2">
+                                <i class="fas fa-star text-warning"></i>
+                                {{ doctor.experience }} Years Experience
+                            </p>
+                            <p class="mb-2">
+                                <i class="fas fa-language"></i>
+                                {% for lang in doctor.languages|fromjson %}
+                                <span class="badge bg-light text-dark">{{ lang }}</span>
+                                {% endfor %}
+                            </p>
+                            <p class="mb-0">
+                                <strong class="text-primary">₹{{ doctor.consultation_fee }}</strong> per consultation
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title">About</h4>
+                    <p class="card-text">{{ doctor.about }}</p>
+                </div>
+            </div>
+
+            <!-- Available Time Slots -->
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Available Time Slots</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Morning</th>
+                                    <th>Evening</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set days = {
+                                    0: 'Sunday',
+                                    1: 'Monday',
+                                    2: 'Tuesday',
+                                    3: 'Wednesday',
+                                    4: 'Thursday',
+                                    5: 'Friday',
+                                    6: 'Saturday'
+                                } %}
+                                {% for day in range(7) %}
+                                {% if day in doctor.available_days|fromjson %}
+                                <tr>
+                                    <td>{{ days[day] }}</td>
+                                    <td>
+                                        {% for slot in timeslots %}
+                                        {% if slot.day_of_week == day and slot.start_time < '12:00' %}
+                                        {{ slot.start_time }} - {{ slot.end_time }}<br>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for slot in timeslots %}
+                                        {% if slot.day_of_week == day and slot.start_time >= '12:00' %}
+                                        {{ slot.start_time }} - {{ slot.end_time }}<br>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Section -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Book Appointment</h4>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-primary btn-lg w-100 mb-3">
+                        Book Now
+                    </a>
+                    <p class="small text-muted mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Select your preferred date and time on the next screen
+                    </p>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Please <a href="{{ url_for('login') }}">login</a> to book an appointment
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.doctor-profile-image-container {
+    width: 100%;
+    padding-bottom: 100%; /* Creates a square aspect ratio */
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+}
+
+.doctor-profile-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+}
+
+.doctor-profile-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %} 

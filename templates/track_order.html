@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Track Your Order</h3>
+                </div>
+                <div class="card-body">
+                    {% if not order_id %}
+                    <form method="GET" action="{{ url_for('track_order') }}" class="mb-4">
+                        <div class="input-group">
+                            <input type="text" name="order_id" class="form-control" placeholder="Enter Order ID" required>
+                            <button type="submit" class="btn btn-primary">Track</button>
+                        </div>
+                    </form>
+                    {% endif %}
+
+                    {% if order %}
+                    <div class="order-details">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4>Order #{{ order.id }}</h4>
+                            <span class="badge bg-{{ 'success' if order.status == 'completed' else 'warning' }} fs-6">
+                                {{ order.status|title }}
+                            </span>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Order Details</h5>
+                                <p class="mb-1"><strong>Order Date:</strong> {{ order.order_date }}</p>
+                                <p class="mb-1"><strong>Total Amount:</strong> ₹{{ "%.2f"|format(order.total_amount) }}</p>
+                                <p class="mb-1"><strong>Payment Method:</strong> {{ order.payment_method|upper }}</p>
+                                <p><strong>Payment Status:</strong> {{ order.payment_status|title }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Delivery Address</h5>
+                                <p class="mb-0">{{ order.delivery_address|replace('\n', '<br>')|safe }}</p>
+                            </div>
+                        </div>
+
+                        <h5>Order Status</h5>
+                        <div class="order-timeline mb-4">
+                            <div class="progress" style="height: 2px;">
+                                <div class="progress-bar bg-primary" role="progressbar" 
+                                    style="width: {{ '100' if order.status == 'completed' else '75' if order.status == 'shipped' else '50' if order.status == 'processing' else '25' }}%">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3">
+                                <div class="text-center">
+                                    <div class="timeline-point {{ 'bg-primary' if order.status in ['pending', 'processing', 'shipped', 'completed'] else 'bg-light' }}"></div>
+                                    <small>Order Placed</small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="timeline-point {{ 'bg-primary' if order.status in ['processing', 'shipped', 'completed'] else 'bg-light' }}"></div>
+                                    <small>Processing</small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="timeline-point {{ 'bg-primary' if order.status in ['shipped', 'completed'] else 'bg-light' }}"></div>
+                                    <small>Shipped</small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="timeline-point {{ 'bg-primary' if order.status == 'completed' else 'bg-light' }}"></div>
+                                    <small>Delivered</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5>Order Items</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Medicine</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order.items %}
+                                    <tr>
+                                        <td>
+                                            {{ item.medicine_name }}
+                                            <br>
+                                            <small class="text-muted">{{ item.description }}</small>
+                                        </td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>₹{{ "%.2f"|format(item.unit_price) }}</td>
+                                        <td>₹{{ "%.2f"|format(item.total_price) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
+                                        <td><strong>₹{{ "%.2f"|format(order.total_amount) }}</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    {% elif order_id %}
+                    <div class="text-center my-5">
+                        <i class="fas fa-exclamation-circle text-warning fa-3x mb-3"></i>
+                        <h4>Order Not Found</h4>
+                        <p class="text-muted">We couldn't find any order with ID #{{ order_id }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-point {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    border: 2px solid #02475b;
+}
+.bg-primary {
+    background-color: #02475b !important;
+}
+.progress-bar {
+    background-color: #02475b;
+}
+.order-timeline {
+    padding: 20px 0;
+}
+.badge {
+    padding: 8px 12px;
+}
+</style>
+{% endblock %} 
