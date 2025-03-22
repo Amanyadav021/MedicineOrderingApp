@@ -11,5 +11,3 @@ This is an online medicine ordering app similar to Apollo 24x7. It allows users 
 ## Setup
 1. Install dependencies: `pip install -r requirements.txt`
 2. Run the app: `python app.py`
-
-
